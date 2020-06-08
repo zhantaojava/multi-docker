@@ -3,24 +3,24 @@ services:
   - docker
 
 before_install:
-  - docker build -t szt/multi-docker -f ./client/Dockerfile.dev ./client
+  - docker build -t szt0172688/multi-docker -f ./client/Dockerfile.dev ./client
 
 script:
-  - docker run -e CI=true szt/multi-docker npm run test -- --coverage
+  - docker run -e CI=true szt0172688/multi-docker npm run test -- --coverage
 
 
 after_success:
-  - docker build -t szt/multi-client ./client
-  - docker build -t szt/multi-nginx  ./nginx
-  - docker build -t szt/multi-server ./server
-  - docker build -t szt/multi-worker ./worker
+  - docker build -t szt0172688/multi-client ./client
+  - docker build -t szt0172688/multi-nginx  ./nginx
+  - docker build -t szt0172688/multi-server ./server
+  - docker build -t szt0172688/multi-worker ./worker
 
   # log in to docker CLI
   - eco "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
   # take those image and push to docker hub
-  - docker push szt/multi-client
-  - docker push szt/multi-nginx
-  - docker push szt/multi-server
-  - docker push szt/multi-worker
+  - docker push szt0172688/multi-client
+  - docker push szt0172688/multi-nginx
+  - docker push szt0172688/multi-server
+  - docker push szt0172688/multi-worker
 
 
