@@ -1,0 +1,58 @@
+version: '3'
+services:
+  postgres:
+    image: 'postgres:latest'
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=postgres_password
+  
+  redis:
+    image: 'redis:latest'
+  nginx:
+    depends_on:
+      - api
+      - client
+    restart: always
+    build: 
+      dockerfile: Dockerfile.dev
+      context: ./nginx
+    ports: 
+      - '3050:80'  
+  api:
+
+    image: szt0172688/multi-server
+    volumes: 
+      #以下的写法代表，在容器里，不要去动这个目录，不要去mount 任何宿主机的目录
+      - /app/node_modules
+      # 把host里 ./serverd的所有内容，映射容器/app目录下
+      - ./server:/app
+      #两句话合起来，就是每次去访问容器里 app/目录下的内容时，除了 node_module里的，其他的都引用宿主机 ./server的
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - PGUSER=postgres
+      - PGHOST=postgres
+      - PGDATABASE=postgres
+      - PGPASSWORD=postgres_password
+      - PGPORT=5432
+    depends_on:
+      - postgres  
+  client: 
+    stdin_open: true
+    image: szt0172688/multi-client
+    volumes:
+      - /app/node_modules
+      - ./client:/app 
+  worker: 
+    environment:
+    - REDIS_HOST=redis
+    - REDIS_PORT=6379
+    image: szt0172688/multi-worker
+    volumes:
+      - /app/node_modules
+      - ./worker:/app
+
+
+
+
+
